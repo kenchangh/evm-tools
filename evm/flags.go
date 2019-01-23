@@ -14,6 +14,7 @@ var appFlags = []cli.Flag{
 	ForceJitFlag,
 	DisableJitFlag,
 
+	FileFlag,
 	CodeFlag,
 	GasFlag,
 	PriceFlag,
@@ -61,6 +62,10 @@ var (
 	}
 
 	// call arguments
+	FileFlag = cli.StringFlag{
+		Name: "file",
+		Usage: "File",
+	}
 	CodeFlag = cli.StringFlag{
 		Name:  "code",
 		Usage: "EVM code",

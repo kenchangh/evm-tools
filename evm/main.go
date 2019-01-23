@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"time"
+    "io/ioutil"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
@@ -57,6 +58,12 @@ func init() {
 	app.Usage = "evm command line tool"
 	app.Flags = appFlags
 	app.Action = run
+}
+
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
 }
 
 func run(ctx *cli.Context) error {
@@ -183,6 +190,18 @@ func run(ctx *cli.Context) error {
 	// if persistence is active and the destination is empty, this is a create
 	if dataDir != "" && emptyTo {
 		input := append(common.Hex2Bytes(ctx.GlobalString(CodeFlag.Name)), common.Hex2Bytes(ctx.GlobalString(InputFlag.Name))...)
+
+		bytecodeFile := ctx.GlobalString(FileFlag.Name)
+
+		if (bytecodeFile != "") {
+			data, err := ioutil.ReadFile(ctx.GlobalString(FileFlag.Name))
+			// fmt.Print(string(data))
+		    check(err)
+		    input = common.Hex2Bytes(string(data))
+		}
+	    // f, err := os.Open()
+    	// check(err)
+
 		ret, contractAddr, err = vmenv.Create(
 			sender,
 			input,
@@ -206,6 +225,7 @@ func run(ctx *cli.Context) error {
 			receiver.SetCode(common.Hex2Bytes(ctx.GlobalString(CodeFlag.Name)))
 		}
 		fmt.Printf("CODE: %X\n", vmenv.Db().GetCode(receiver.Address()))
+		tstart = time.Now()
 		ret, err = vmenv.Call(
 			sender,
 			receiver.Address(),
