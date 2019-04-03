@@ -180,7 +180,7 @@ func run(ctx *cli.Context) error {
 	vmenv := core.NewEnv(statedb, chainConfig, bc, msg, header, chainConfig.VmConfig)
 
 	initdone := time.Since(tstart)
-	fmt.Printf("Init: %v", initdone)
+	fmt.Printf("Init: %v\n", float64(initdone)/float64(time.Millisecond))
 
 	var (
 		ret          []byte
@@ -255,12 +255,12 @@ func run(ctx *cli.Context) error {
 	}
 	vm.StdErrFormat(vmenv.StructLogs())
 	ioTend := time.Since(tstart)
-	fmt.Printf("IO: %v\n", ioTend)
+	fmt.Printf("IO: %v\n", float64(ioTend)/float64(time.Millisecond))
+	fmt.Printf("vm took %v\n", float64(vmdone)/float64(time.Millisecond))
 
 	if ctx.GlobalBool(SysStatFlag.Name) {
 		var mem runtime.MemStats
 		runtime.ReadMemStats(&mem)
-		fmt.Printf("vm took %v\n", vmdone)
 		fmt.Printf(`alloc:      %d
 tot alloc:  %d
 no. malloc: %d
