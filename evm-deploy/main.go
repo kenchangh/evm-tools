@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/big"
+	"strings"
 	"os"
 )
 
@@ -19,7 +20,6 @@ const (
 // wrap some code with deploy code (ie. copy it to memory and return it)
 // TODO: option to set initialization code
 func main() {
-
 	// read non-prefixed hex-encoded byte-code from stdin
 	b, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
@@ -28,7 +28,18 @@ func main() {
 	}
 	b = bytes.TrimSpace(b)
 	contractCodeHex := string(b)
-	contractCode, err := hex.DecodeString(contractCodeHex)
+	
+	isCode := strings.Contains(contractCodeHex, "0x")
+	var contractCode
+	
+	if isCode {
+		filePath, err := hex.DecodeString(contractCodeHex)
+	} else {
+		data, err := ioutil.ReadFile(filePath)
+	       contractCode = common.Hex2Bytes(string(data))
+	}
+	
+	
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
