@@ -36,7 +36,8 @@ func main() {
 	if isCode {
 		contractCode, err = hex.DecodeString(contractCodeHex)
 	} else {
-		data, err := ioutil.ReadFile(contractCodeHex)
+		data, err2 := ioutil.ReadFile(contractCodeHex)
+		err = err2
 	       contractCode = common.Hex2Bytes(string(data))
 	}
 	
