@@ -30,7 +30,7 @@ func main() {
 	contractCodeHex := string(b)
 	
 	isCode := strings.Contains(contractCodeHex, "0x")
-	var contractCode byte[]
+	var contractCode []byte
 	
 	if isCode {
 		contractCode, err = hex.DecodeString(contractCodeHex)
