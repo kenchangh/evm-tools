@@ -30,10 +30,10 @@ func main() {
 	contractCodeHex := string(b)
 	
 	isCode := strings.Contains(contractCodeHex, "0x")
-	var contractCode
+	var contractCode byte[]
 	
 	if isCode {
-		filePath, err := hex.DecodeString(contractCodeHex)
+		contractCode, err = hex.DecodeString(contractCodeHex)
 	} else {
 		data, err := ioutil.ReadFile(filePath)
 	       contractCode = common.Hex2Bytes(string(data))
