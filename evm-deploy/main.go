@@ -8,6 +8,7 @@ import (
 	"math/big"
 	"strings"
 	"os"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 const (
