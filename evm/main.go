@@ -23,11 +23,11 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
-    "io/ioutil"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
@@ -61,12 +61,13 @@ func init() {
 }
 
 func check(e error) {
-    if e != nil {
-        panic(e)
-    }
+	if e != nil {
+		panic(e)
+	}
 }
 
 func run(ctx *cli.Context) error {
+	tstart := time.Now()
 	glog.SetToStderr(true)
 	glog.SetV(ctx.GlobalInt(VerbosityFlag.Name))
 
@@ -178,7 +179,8 @@ func run(ctx *cli.Context) error {
 
 	vmenv := core.NewEnv(statedb, chainConfig, bc, msg, header, chainConfig.VmConfig)
 
-	tstart := time.Now()
+	initdone := time.Since(tstart)
+	fmt.Printf("Init: %v", initdone)
 
 	var (
 		ret          []byte
@@ -193,14 +195,14 @@ func run(ctx *cli.Context) error {
 
 		bytecodeFile := ctx.GlobalString(FileFlag.Name)
 
-		if (bytecodeFile != "") {
+		if bytecodeFile != "" {
 			data, err := ioutil.ReadFile(ctx.GlobalString(FileFlag.Name))
 			// fmt.Print(string(data))
-		    check(err)
-		    input = common.Hex2Bytes(string(data))
+			check(err)
+			input = common.Hex2Bytes(string(data))
 		}
-	    // f, err := os.Open()
-    	// check(err)
+		// f, err := os.Open()
+		// check(err)
 
 		ret, contractAddr, err = vmenv.Create(
 			sender,
@@ -237,6 +239,8 @@ func run(ctx *cli.Context) error {
 	}
 	vmdone := time.Since(tstart)
 
+	tstart = time.Now()
+
 	rootHash, err = statedb.Commit()
 	if err != nil {
 		panic(err)
@@ -250,6 +254,8 @@ func run(ctx *cli.Context) error {
 		fmt.Println(string(statedb.Dump()))
 	}
 	vm.StdErrFormat(vmenv.StructLogs())
+	ioTend := time.Since(tstart)
+	fmt.Printf("IO: %v\n", ioTend)
 
 	if ctx.GlobalBool(SysStatFlag.Name) {
 		var mem runtime.MemStats

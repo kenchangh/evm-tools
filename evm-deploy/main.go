@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/big"
-	"strings"
 	"os"
+
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -29,19 +29,15 @@ func main() {
 	}
 	b = bytes.TrimSpace(b)
 	contractCodeHex := string(b)
-	
-	isCode := strings.Contains(contractCodeHex, "0x")
-	var contractCode []byte
-	
-	if isCode {
-		contractCode, err = hex.DecodeString(contractCodeHex)
-	} else {
+
+	contractCode, err := hex.DecodeString(contractCodeHex)
+
+	if err != nil {
 		data, err2 := ioutil.ReadFile(contractCodeHex)
 		err = err2
-	       contractCode = common.Hex2Bytes(string(data))
+		contractCode = common.Hex2Bytes(string(data))
 	}
-	
-	
+
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
